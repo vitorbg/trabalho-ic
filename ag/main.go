@@ -2,65 +2,34 @@ package main
 
 import (
 	"fmt"
-	//"math"
-	"bufio"
+	// "math"
+	// "bufio"
 	"math/rand"
-	"os"
+	// "os"
 	"time"
 )
 
-/*
-1 a Etapa) (3 Pontos) Executar o AG no problema (SEND+MORE=MONEY), adotando algumas
-especificações fixas:
-- Indivíduo: vetor de inteiros de tamanho: 10
-- Geração da população inicial: aleatória não permitindo repetições;
-- Função de avaliação (Fitness): |(SEND+MORE)-MONEY|
-- Tamanho da população: 100
-- Número de gerações: 200
-- Método de mutação: troca de 2 posições no vetor, dentre as 10 possíveis
-- Taxa de crossover: 80%
-- Tipo de crossover: Crossover cíclico
-Utilizando essas especificações acima, a valiar algumas opções de métodos para três etapas do AG (seleção de
-pais, crossover e reinserção):
-- Taxa de mutação: (TM1) 10%,
-(TM2) 20%
-- Método para seleção dos pares: (S1) Roleta
-(S2) Torneio de tamanho 3
-- Método para reinserção da população: (R1) Reinserção ordenada (melhores entre pais e filhos) (R2) Reinserção
-pura com elitismo de 20% (nesse caso, a taxa de crossover é 80%)
-Executar o AG 1000 vezes para cada configuração (das 8 combinações possíveis) para o primeiro problema.
-Avaliar comparativamente os resultados obtidos, buscando selecionar a melhor configuração. Parâmetros
-importantes nessa avaliação: percentual de convergência (para uma solução válida) e tempo de execução.
-Justificar no relatório o motivo da escolha da melhor configuração.
-*/
-
 const CROSS_OVER_RATIO = 0.8
-const POPULATION_PARENTS_SIZE = 20
+const MUTATION_RATIO = 0.2
+const ELITISM_RATIO = 0.2
 
+const POPULATION_PARENTS_SIZE = 100
 const POPULATION_CHILDREN_SIZE = POPULATION_PARENTS_SIZE * CROSS_OVER_RATIO
 const POPULATION_TOTAL_SIZE = POPULATION_PARENTS_SIZE + POPULATION_CHILDREN_SIZE
 
-const MUTATION_RATIO = 0.1
+const ELITISM_QT_PARENTS = int(POPULATION_PARENTS_SIZE * ELITISM_RATIO)
+const MUTATION_QT_INDIVIDUALS = int(POPULATION_CHILDREN_SIZE * MUTATION_RATIO)
+const CROSS_OVER_QT = int(POPULATION_CHILDREN_SIZE / 2)
 
-const ELITISM_RATIO = 0.2
-
-//const ELITISM_QT_PARENTS = POPULATION_PARENTS_SIZE * ELITISM_RATIO
-const ELITISM_QT_PARENTS = 4
-
-//const MUTATION_QT_INDIVIDUALS = POPULATION_CHILDREN_SIZE * MUTATION_RATIO
-const MUTATION_QT_INDIVIDUALS = 2
-
-const CROSS_OVER_QT = POPULATION_CHILDREN_SIZE / 2
-
-const INDIVIDUAL_SIZE = 10
 const VECTOR_SIZE = 13
+const INDIVIDUAL_SIZE = 10
 const POS_EVAL = 10
 const POS_FITNESS = 11
 const POS_ACC_ROULLETE = 12
 
 const TOUR = 3
-const NUM_GENERATION = 10
-const NUM_EXECUTION = 10
+const NUM_GENERATION = 200
+const NUM_EXECUTION = 1000
 
 const S1_ROULETTE = 1
 const S2_TOURNAMENT = 2
@@ -82,10 +51,12 @@ var population [POPULATION_TOTAL_SIZE][VECTOR_SIZE]int
 
 func main() {
 	selection := S1_ROULETTE
-	//selection := S2_TOURNAMENT
-	//reinsertion := R1_REINSERTION_ORDERLY
-	reinsertion := R2_REINSERTION_PURE_ELITISM
+	// selection := S2_TOURNAMENT
+	reinsertion := R1_REINSERTION_ORDERLY
+	// reinsertion := R2_REINSERTION_PURE_ELITISM
 	fmt.Println("Globals Configurations ----------------------------------------")
+	fmt.Println("NUM_EXECUTION: ", NUM_EXECUTION)
+	fmt.Println("NUM_GENERATION: ", NUM_GENERATION)
 	fmt.Println("POPULATION_PARENTS_SIZE: ", POPULATION_PARENTS_SIZE)
 	fmt.Println("POPULATION_CHILDREN_SIZE: ", POPULATION_CHILDREN_SIZE)
 	fmt.Println("POPULATION_TOTAL_SIZE: ", POPULATION_TOTAL_SIZE)
@@ -109,43 +80,71 @@ func main() {
 	}
 	fmt.Println("---------------------------------------------------------------")
 
-	// for i := 0; i < NUM_EXECUTION; i++ {
-	initPopulation()
-	calcPopulationFitness()
-	printPopulation()
-
-	for j := 0; j < NUM_GENERATION; j++ {
-		fmt.Println("GENERATION ", j)
-		//SELECTION AND CROSS OVER PHASE *****************************************
-		for k := 0; k < CROSS_OVER_QT; k++ {
-			var pos_parent_1, pos_parent_2 int
-			if selection == S1_ROULETTE {
-				pos_parent_1, pos_parent_2 = selectionRoullete()
-			}
-			if selection == S2_TOURNAMENT {
-				pos_parent_1, pos_parent_2 = selectionTournament()
-			}
-
-			calcCrossOverCycle(population[pos_parent_1], population[pos_parent_2])
-		}
-		//************************************************************************
-		printPopulation()
-		//REINSERTION PHASE ******************************************************
-		if reinsertion == R1_REINSERTION_ORDERLY {
-			reinsertionOrderly()
-		}
-		if reinsertion == R2_REINSERTION_PURE_ELITISM {
-			reinsertionPureElitism()
-		}
-		//************************************************************************
-		//MUTATION PHASE *********************************************************
-		mutation()
-		//************************************************************************
+	var qt_generation int
+	qt_find_optimal := 0
+	timeGeneration := time.Now()
+	for i := 0; i < NUM_EXECUTION; i++ {
+		initPopulation()
 		calcPopulationFitness()
-		printPopulation()
-		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		//printPopulation()
+		for j := 0; j < NUM_GENERATION; j++ {
+			// fmt.Println("GENERATION ", j)
+			//SELECTION AND CROSS OVER PHASE *****************************************
+			index := 0
+			for k := 0; k < CROSS_OVER_QT; k++ {
+				var pos_parent_1, pos_parent_2 int
+				if selection == S1_ROULETTE {
+					pos_parent_1, pos_parent_2 = selectionRoullete()
+				}
+				if selection == S2_TOURNAMENT {
+					pos_parent_1, pos_parent_2 = selectionTournament()
+				}
+
+				child_1, child_2 := calcCrossOverCycle(population[pos_parent_1], population[pos_parent_2])
+
+				population[POPULATION_PARENTS_SIZE+index] = child_1
+				population[POPULATION_PARENTS_SIZE+index+1] = child_2
+				index = index + 2
+			}
+			//************************************************************************
+			//printPopulation()
+			//REINSERTION PHASE ******************************************************
+			if reinsertion == R1_REINSERTION_ORDERLY {
+				reinsertionOrderly()
+			}
+			if reinsertion == R2_REINSERTION_PURE_ELITISM {
+				reinsertionPureElitism()
+			}
+			//************************************************************************
+			//MUTATION PHASE *********************************************************
+			mutation()
+			//************************************************************************
+			// pos_optimal, ok := calcPopulationFitness()
+			_, ok := calcPopulationFitness()
+			if ok {
+				// fmt.Print("Execution: [", i)
+				// fmt.Print("] Generation: [", j)
+				// fmt.Println("] Solution: ", population[pos_optimal])
+				qt_generation = qt_generation + j
+				qt_find_optimal++
+				j = NUM_GENERATION + 2
+			}
+			// printPopulation()
+		}
 	}
-	// }
+
+	time2 := time.Now()
+	time2.Sub(timeGeneration)
+
+	fmt.Println("Metrics -------------------------------------------------------")
+	// fmt.Println("Qt Generations Total: ", qt_generation)
+	fmt.Println("Generation Average: ", qt_generation/NUM_EXECUTION)
+	fmt.Println("Convertion Ratio: ", float32(qt_find_optimal)/float32(NUM_EXECUTION))
+	fmt.Println("Execution Total Time: ", time2.Sub(timeGeneration))
+	fmt.Println("Execution Generation Time: ", (time2.Sub(timeGeneration))/NUM_EXECUTION)
+	fmt.Println("---------------------------------------------------------------")
+
+	//	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 }
 
@@ -221,6 +220,7 @@ func calcCrossOverCycle(individual_1 [VECTOR_SIZE]int, individual_2 [VECTOR_SIZE
 }
 
 func selectionRoullete() (int, int) {
+	QuickSort(&population, true)
 	population[0][POS_ACC_ROULLETE] = population[0][POS_FITNESS]
 
 	for i := 1; i < POPULATION_PARENTS_SIZE; i++ {
@@ -260,19 +260,20 @@ func selectionTournament() (int, int) {
 }
 
 func getParentTour() int {
-	var winner int
-	var n int
-	topgrade := 999999
+	var winner_pos int
+	var candidate_pos int
 
-	for i := 0; i < TOUR; i++ {
-		n = rand.Intn(POPULATION_PARENTS_SIZE)
+	winner_pos = rand.Intn(POPULATION_PARENTS_SIZE)
+
+	for i := 1; i < TOUR; i++ {
+		candidate_pos = rand.Intn(POPULATION_PARENTS_SIZE)
 		// fmt.Println("n sorted: ", n, population[n])
-		if population[n][POS_EVAL] < topgrade {
-			winner = n
+		if population[candidate_pos][POS_EVAL] < population[winner_pos][POS_EVAL] {
+			winner_pos = candidate_pos
 		}
 	}
 	// fmt.Println("winner: ",winner)
-	return winner
+	return winner_pos
 }
 
 func reinsertionOrderly() {
@@ -290,7 +291,7 @@ func reinsertionPureElitism() {
 
 func mutation() {
 	for i := 0; i < int(MUTATION_QT_INDIVIDUALS); i++ {
-		pos_individual := rand.Intn(POPULATION_CHILDREN_SIZE)
+		pos_individual := rand.Intn(POPULATION_PARENTS_SIZE)
 		pos_1 := rand.Intn(INDIVIDUAL_SIZE)
 		pos_2 := rand.Intn(INDIVIDUAL_SIZE)
 		// fmt.Println("Mutation Individual: ", pos_individual+POPULATION_PARENTS_SIZE)
@@ -306,15 +307,19 @@ func mutation() {
 
 func printPopulation() {
 	for i := 0; i < POPULATION_TOTAL_SIZE; i++ {
-		fmt.Println("Individuo ", i)
-		fmt.Println(population[i])
+		fmt.Print("Individuo [", i)
+		fmt.Println("]: ", population[i])
 	}
 }
 
-func calcPopulationFitness() {
+func calcPopulationFitness() (int, bool) {
 	for i := 0; i < POPULATION_TOTAL_SIZE; i++ {
 		calcIndividualFitness(&population[i])
+		if population[i][POS_EVAL] == 0 {
+			return i, true
+		}
 	}
+	return -1, false
 }
 
 func calcIndividualFitness(individual *[VECTOR_SIZE]int) {
@@ -360,7 +365,6 @@ func calcIndividualFitness(individual *[VECTOR_SIZE]int) {
 }
 
 func QuickSort(values *[POPULATION_TOTAL_SIZE][VECTOR_SIZE]int, elitism bool) {
-
 	if elitism {
 		sort(values, 0, POPULATION_PARENTS_SIZE-1)
 	} else {
