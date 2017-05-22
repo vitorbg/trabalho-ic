@@ -10,7 +10,7 @@ import (
 )
 
 const CROSS_OVER_RATIO = 0.8
-const MUTATION_RATIO = 0.2
+const MUTATION_RATIO = 0.3
 const ELITISM_RATIO = 0.2
 
 const POPULATION_PARENTS_SIZE = 100
@@ -51,9 +51,9 @@ var population [POPULATION_TOTAL_SIZE][VECTOR_SIZE]int
 
 func main() {
 	selection := S1_ROULETTE
-	// selection := S2_TOURNAMENT
-	reinsertion := R1_REINSERTION_ORDERLY
-	// reinsertion := R2_REINSERTION_PURE_ELITISM
+	//  selection := S2_TOURNAMENT
+	// reinsertion := R1_REINSERTION_ORDERLY
+	reinsertion := R2_REINSERTION_PURE_ELITISM
 	fmt.Println("Globals Configurations ----------------------------------------")
 	fmt.Println("NUM_EXECUTION: ", NUM_EXECUTION)
 	fmt.Println("NUM_GENERATION: ", NUM_GENERATION)
