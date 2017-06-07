@@ -22,8 +22,9 @@ const RECORD_SIZE = 35
 const RECORD_QUANTITY = 100
 const TRAINING_DATABASE = true
 
-const CROSS_OVER_RATIO = 100
+const CROSS_OVER_RATIO = 1
 const MUTATION_RATIO = 0.3
+
 //const ELITISM_RATIO = 0.2
 
 const POPULATION_PARENTS_SIZE = 50
@@ -34,15 +35,13 @@ const ELITISM_QT_PARENTS = 1
 const MUTATION_QT_INDIVIDUALS = int(POPULATION_CHILDREN_SIZE * MUTATION_RATIO)
 const CROSS_OVER_QT = int(POPULATION_CHILDREN_SIZE / 2)
 
-const VECTOR_SIZE = 35
-const INDIVIDUAL_SIZE = 35
+const VECTOR_SIZE = 36
+const INDIVIDUAL_SIZE = 34
 const POS_EVAL = 34
-
-//const POS_FITNESS = 11
-//const POS_ACC_ROULLETE = 12
+const POS_ACC_ROULETTE = 35
 
 const TOUR = 3
-const NUM_GENERATION = 200
+const NUM_GENERATION = 5
 const NUM_EXECUTION = 1000
 
 const S1_ROULETTE = 1
@@ -59,6 +58,9 @@ type Individual struct {
 var database [RECORD_QUANTITY][RECORD_SIZE]int
 var population [POPULATION_TOTAL_SIZE][VECTOR_SIZE]Individual
 var class_of_execution int
+var acc_roulette float32
+var n_roulette float32
+var aux_roulette float32
 
 /*Os operadores genéticos utilizados foram os seguintes: torneio
 estocástico, de tamanho 3, como método de seleção; crossover
@@ -75,10 +77,9 @@ func main() {
 	class_of_execution = 1
 
 	initDatabase()
-	fmt.Println(database)
 	initPopulation()
 	calcPopulationFitness()
-	printPopulation()
+	// printPopulation()
 	index := 0
 	//SELECTION AND CROSS OVER PHASE *****************************************
 
@@ -95,8 +96,14 @@ func main() {
 	}
 	//************************************************************************
 
-	reinsertionElitismOfTheBetter()
+	prepareRoulette()
+	printPopulation()
+	selectionRoullete()
 
+	// printPopulation()
+	//reinsertionElitismOfTheBetter()
+
+	fmt.Println("ACC roulette: ", acc_roulette)
 }
 
 func reinsertionElitismOfTheBetter() {
@@ -146,10 +153,59 @@ func calcCrossOverTwoPoints(individual_1 [VECTOR_SIZE]Individual, individual_2 [
 	// fmt.Println("AFTER CROOS OVER")
 	// fmt.Println(point_one)
 	// fmt.Println(point_two)
-	// printIndividual(child_1)
-	// printIndividual(child_2)
+	printIndividual(child_1)
+	printIndividual(child_2)
 
 	return child_1, child_2
+}
+
+func random(min, max float32) float32 {
+	return rand.Float32()*(max-min) + min
+}
+
+func prepareRoulette() {
+
+	n_roulette = (float32(1) / float32(150))
+	aux_roulette = 0
+
+	for i := 0; i < POPULATION_PARENTS_SIZE; i++ {
+		acc_roulette = acc_roulette + population[i][POS_EVAL].Weight
+	}
+
+	population[0][POS_ACC_ROULETTE].Weight = population[0][POS_EVAL].Weight / acc_roulette
+
+	for i := 1; i < POPULATION_PARENTS_SIZE; i++ {
+		population[i][POS_ACC_ROULETTE].Weight = (population[i][POS_EVAL].Weight / acc_roulette) + population[i-1][POS_ACC_ROULETTE].Weight
+	}
+}
+
+func selectionRoullete() (int, int) {
+	var pos_winner_1 int
+	var pos_winner_2 int
+	var sorted float32
+
+	for i := 0; i < TOUR+10; i++ {
+		sorted = random(aux_roulette, n_roulette)
+
+		fmt.Println(fmt.Sprintf("Range[%f - %f]", aux_roulette, n_roulette))
+		fmt.Println("sorted: ", sorted)
+
+		aux_roulette = n_roulette
+		n_roulette = aux_roulette + n_roulette
+
+		for i := 0; i < POPULATION_PARENTS_SIZE; i++ {
+			if sorted < population[i][POS_ACC_ROULETTE].Weight {
+				pos_winner_1 = i
+				i = POPULATION_PARENTS_SIZE + 2
+			}
+		}
+		fmt.Println("pos_winner_1: ", pos_winner_1)
+	}
+
+	// fmt.Println("pos_winner_1: ", pos_winner_1)
+	// fmt.Println("pos_winner_2: ", pos_winner_2)
+
+	return pos_winner_1, pos_winner_2
 }
 
 func selectionTournament() (int, int) {
@@ -177,25 +233,20 @@ func getParentTour() int {
 }
 
 func calcPopulationFitness() (int, bool) {
+
 	for i := 0; i < POPULATION_TOTAL_SIZE; i++ {
 		calcIndividualFitness(&population[i])
-		// if population[i][POS_EVAL] == 0 {
-		// 	return i, true
-		// }
 	}
 	return -1, false
 }
 
 func calcIndividualFitness(individual *[VECTOR_SIZE]Individual) {
-	var i, j, k int
+	var i, k int
 	var fp, fn, tn, tp float32
 	var sp, se, eval float32
 	/*Falsos positivos (Fp), falsos negativos (Fn),
 	verdadeiros negativos (Tn) e verdadeiros positivos (Tp)*/
 
-	fmt.Println(j)
-	fmt.Println(individual)
-	fmt.Println(database[0])
 	for k = 0; k < RECORD_QUANTITY; k++ {
 		for i = 0; i < RECORD_SIZE-2; i++ { //Less 2, Age and Class
 			/*SE A  ENTAO C  = TP
@@ -203,10 +254,10 @@ func calcIndividualFitness(individual *[VECTOR_SIZE]Individual) {
 			SE ¬A ENTAO C  = FN
 			SE ¬A ENTAO ¬C = TN*/
 			if individual[i].Weight >= 0.7 {
-				fmt.Print("  ", individual[i].Weight)
-				fmt.Print("  ", individual[i].Operator)
-				fmt.Print("  ", individual[i].Value)
-				fmt.Println(" ")
+				// fmt.Print("  ", individual[i].Weight)
+				// fmt.Print("  ", individual[i].Operator)
+				// fmt.Print("  ", individual[i].Value)
+				// fmt.Println(" ")
 
 				switch individual[i].Operator {
 
@@ -290,7 +341,7 @@ func initPopulation() {
 	var i, j int
 
 	for i = 0; i < POPULATION_PARENTS_SIZE; i++ {
-		for j = 0; j < INDIVIDUAL_SIZE-1; j++ {
+		for j = 0; j < INDIVIDUAL_SIZE; j++ {
 			var individual Individual
 
 			individual.Weight = rand.Float32()
@@ -322,6 +373,10 @@ func printIndividual(individual [VECTOR_SIZE]Individual) {
 }
 
 func initDatabase() {
+	// 366 / 6 = 61 records for each class
+	// training = 244 records - 40 records for each class
+	// teste = 122 records - 20 records fo each class
+	//var class_1, class_2, class_3, class_4, class_5, class_6 int
 	if file, err := os.Open("dermatology.data"); err == nil {
 
 		defer file.Close()
@@ -331,8 +386,9 @@ func initDatabase() {
 		//for scanner.Scan() {
 		for k := 0; k < RECORD_QUANTITY; k++ {
 			scanner.Scan()
-			fmt.Println(scanner.Text())
 			result := strings.Split(scanner.Text(), ",")
+			//			class, _ := strconv.Atoi(result[RECORD_SIZE-1])
+
 			for j := 0; j < RECORD_SIZE; j++ {
 				database[i][j], _ = strconv.Atoi(result[j])
 			}
