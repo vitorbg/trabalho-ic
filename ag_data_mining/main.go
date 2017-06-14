@@ -12,27 +12,32 @@ import (
 )
 
 const (
-	EQUAL = iota
-	DIFFERENT
-	GREATER_OR_EQUAL
-	LESS
+	EQUAL            = iota //0
+	DIFFERENT               //1
+	GREATER_OR_EQUAL        //2
+	LESS                    //3
 )
 
 const RECORD_SIZE = 35
-const RECORD_QUANTITY = 100
+const RECORD_QUANTITY_TRAINING = 234
+//const RECORD_QUANTITY = 234
+
+const RECORD_QUANTITY = 114
+const RECORD_POS_CLASS = 34
+const RECORD_TOTAL_DATABASE = 358
 const TRAINING_DATABASE = true
 
 const CROSS_OVER_RATIO = 1
-const MUTATION_RATIO = 0.3
 
-//const ELITISM_RATIO = 0.2
+const POS_FAMILY_HISTORY = 10 //11: family history, (0 or 1)
+const POS_AGE = 33            //34: Age (linear)
 
 const POPULATION_PARENTS_SIZE = 50
 const POPULATION_CHILDREN_SIZE = POPULATION_PARENTS_SIZE * CROSS_OVER_RATIO
 const POPULATION_TOTAL_SIZE = POPULATION_PARENTS_SIZE + POPULATION_CHILDREN_SIZE
 
 const ELITISM_QT_PARENTS = 1
-const MUTATION_QT_INDIVIDUALS = int(POPULATION_CHILDREN_SIZE * MUTATION_RATIO)
+const MUTATION_QT_GENE = 10 //30% of 34 genes
 const CROSS_OVER_QT = int(POPULATION_CHILDREN_SIZE / 2)
 
 const VECTOR_SIZE = 36
@@ -73,37 +78,98 @@ gene  do  cromossomo.
 Assim,  aplicou-se  uma  taxa de  mutação
 de 30%, para cada tipo de mutação separadamente.*/
 
+var individual_test_1 [VECTOR_SIZE]Individual
+
+func initIndividualTest() {
+	//	20: clubbing of the rete ridges >=1
+	//  31: perifollicular parakeratosis = 0
+	individual_test_1[19].Weight = 0.7
+	individual_test_1[19].Operator = 2
+	individual_test_1[19].Value = 1
+	individual_test_1[30].Weight = 0.7
+	individual_test_1[30].Operator = 0
+	individual_test_1[30].Value = 0
+	//
+	// individual_test_1[5].Weight = 0.7
+	// individual_test_1[5].Operator = 3
+	// individual_test_1[5].Value = 2
+	// individual_test_1[7].Weight = 0.7
+	// individual_test_1[7].Operator = 2
+	// individual_test_1[7].Value = 2
+}
+
 func main() {
 	class_of_execution = 1
 
 	initDatabase()
 	initPopulation()
-	calcPopulationFitness()
+
+	initIndividualTest()
+	printIndividual(individual_test_1)
+	calcIndividualFitness(&individual_test_1)
+	printIndividual(individual_test_1)
+
+	//calcPopulationFitness()
 	// printPopulation()
-	index := 0
+	// index := 0
 	//SELECTION AND CROSS OVER PHASE *****************************************
 
-	for k := 0; k < CROSS_OVER_QT; k++ {
-		//var pos_parent_1, pos_parent_2 int
-
-		pos_parent_1, pos_parent_2 := selectionTournament()
-
-		child_1, child_2 := calcCrossOverTwoPoints(population[pos_parent_1], population[pos_parent_2])
-
-		population[POPULATION_PARENTS_SIZE+index] = child_1
-		population[POPULATION_PARENTS_SIZE+index+1] = child_2
-		index = index + 2
-	}
+	// for k := 0; k < CROSS_OVER_QT; k++ {
+	// 	//var pos_parent_1, pos_parent_2 int
+	//
+	// 	pos_parent_1, pos_parent_2 := selectionTournament()
+	//
+	// 	child_1, child_2 := calcCrossOverTwoPoints(population[pos_parent_1], population[pos_parent_2])
+	//
+	// 	population[POPULATION_PARENTS_SIZE+index] = child_1
+	// 	population[POPULATION_PARENTS_SIZE+index+1] = child_2
+	// 	index = index + 2
+	// }
 	//************************************************************************
 
-	prepareRoulette()
-	printPopulation()
-	selectionRoullete()
+	// prepareRoulette()
+	// printPopulation()
+	// selectionRoullete()
 
 	// printPopulation()
 	//reinsertionElitismOfTheBetter()
+	//MUTATION PHASE *********************************************************
+	// mutationPopulation()
+	// printIndividual(population[0])
+	// mutationIndividual(&population[0])
+	// printIndividual(population[0])
+	//************************************************************************
 
 	fmt.Println("ACC roulette: ", acc_roulette)
+}
+
+func mutationPopulation() {
+	for i := 0; i < POPULATION_TOTAL_SIZE; i++ {
+		mutationIndividual(&population[i])
+	}
+}
+
+func mutationIndividual(individual *[VECTOR_SIZE]Individual) {
+	var i int
+	rand.Seed(time.Now().UTC().UnixNano())
+	for i = 0; i < MUTATION_QT_GENE; i++ { // Mutation on Weight
+		gene := rand.Intn(INDIVIDUAL_SIZE)
+		individual[gene].Weight = rand.Float32()
+		// fmt.Print(" ", gene)
+	}
+	// fmt.Println(" ")
+	for i = 0; i < MUTATION_QT_GENE; i++ { // Mutation on Operator
+		gene := rand.Intn(INDIVIDUAL_SIZE)
+		individual[gene].Operator = rand.Intn(4)
+		// fmt.Print(" ", gene)
+	}
+	// fmt.Println(" ")
+	for i = 0; i < MUTATION_QT_GENE; i++ { // Mutation on Value
+		gene := rand.Intn(INDIVIDUAL_SIZE)
+		individual[gene].Value = rand.Intn(4)
+		// fmt.Print(" ", gene)
+	}
+	// fmt.Println(" ")
 }
 
 func reinsertionElitismOfTheBetter() {
@@ -132,8 +198,8 @@ func calcCrossOverTwoPoints(individual_1 [VECTOR_SIZE]Individual, individual_2 [
 	child_2 := individual_2
 
 	var aux int
-	point_one := rand.Intn(INDIVIDUAL_SIZE - 1)
-	point_two := rand.Intn(INDIVIDUAL_SIZE - 1)
+	point_one := rand.Intn(INDIVIDUAL_SIZE)
+	point_two := rand.Intn(INDIVIDUAL_SIZE)
 
 	// fmt.Println("START CROSS OVER")
 	// printIndividual(child_1)
@@ -153,8 +219,8 @@ func calcCrossOverTwoPoints(individual_1 [VECTOR_SIZE]Individual, individual_2 [
 	// fmt.Println("AFTER CROOS OVER")
 	// fmt.Println(point_one)
 	// fmt.Println(point_two)
-	printIndividual(child_1)
-	printIndividual(child_2)
+	// printIndividual(child_1)
+	// printIndividual(child_2)
 
 	return child_1, child_2
 }
@@ -201,7 +267,6 @@ func selectionRoullete() (int, int) {
 		}
 		fmt.Println("pos_winner_1: ", pos_winner_1)
 	}
-
 	// fmt.Println("pos_winner_1: ", pos_winner_1)
 	// fmt.Println("pos_winner_2: ", pos_winner_2)
 
@@ -233,9 +298,10 @@ func getParentTour() int {
 }
 
 func calcPopulationFitness() (int, bool) {
-
 	for i := 0; i < POPULATION_TOTAL_SIZE; i++ {
+		fmt.Println("Individual ", i)
 		calcIndividualFitness(&population[i])
+		fmt.Println(" ")
 	}
 	return -1, false
 }
@@ -244,11 +310,15 @@ func calcIndividualFitness(individual *[VECTOR_SIZE]Individual) {
 	var i, k int
 	var fp, fn, tn, tp float32
 	var sp, se, eval float32
+	var fail_A, fail_C bool
+
 	/*Falsos positivos (Fp), falsos negativos (Fn),
 	verdadeiros negativos (Tn) e verdadeiros positivos (Tp)*/
 
 	for k = 0; k < RECORD_QUANTITY; k++ {
-		for i = 0; i < RECORD_SIZE-2; i++ { //Less 2, Age and Class
+		fail_A = false
+		fail_C = false
+		for i = 0; i < RECORD_SIZE; i++ {
 			/*SE A  ENTAO C  = TP
 			SE A  ENTAO ¬C = FP
 			SE ¬A ENTAO C  = FN
@@ -258,104 +328,146 @@ func calcIndividualFitness(individual *[VECTOR_SIZE]Individual) {
 				// fmt.Print("  ", individual[i].Operator)
 				// fmt.Print("  ", individual[i].Value)
 				// fmt.Println(" ")
-
-				switch individual[i].Operator {
-
-				case EQUAL:
-					if individual[i].Value == database[k][i] { // A
-						if class_of_execution == database[k][RECORD_SIZE-1] { // C
-							tp++
-						} else { // ¬C
-							fp++
+				if i == POS_AGE || i == POS_FAMILY_HISTORY {
+				} else {
+					switch individual[i].Operator {
+					case EQUAL:
+						if individual[i].Value == database[k][i] { // A
+							if class_of_execution == database[k][RECORD_POS_CLASS] { // C
+								//tp++
+							} else { // ¬C
+								//fp++
+								fail_C = true
+							}
+						} else { // ¬A
+							if class_of_execution == database[k][RECORD_POS_CLASS] { // C
+								// fn++
+								fail_A = true
+							} else { // ¬C
+								// tn++
+								fail_A = true
+								fail_C = true
+							}
 						}
-					} else { // ¬A
-						if class_of_execution == database[k][RECORD_SIZE-1] { // C
-							fn++
-						} else { // ¬C
-							tn++
+					case DIFFERENT:
+						if individual[i].Value == database[k][i] { // A
+							if class_of_execution == database[k][RECORD_POS_CLASS] { // C
+								// tp++
+							} else { // ¬C
+								// fp++
+								fail_C = true
+							}
+						} else { // ¬A
+							if class_of_execution == database[k][RECORD_POS_CLASS] { // C
+								// fn++
+								fail_A = true
+							} else { // ¬C
+								// tn++
+								fail_A = true
+								fail_C = true
+							}
 						}
-					}
-				case DIFFERENT:
-					if individual[i].Value == database[k][i] { // A
-						if class_of_execution == database[k][RECORD_SIZE-1] { // C
-							tp++
-						} else { // ¬C
-							fp++
+					case GREATER_OR_EQUAL:
+						if individual[i].Value == database[k][i] { // A
+							if class_of_execution == database[k][RECORD_POS_CLASS] { // C
+								// tp++
+							} else { // ¬C
+								// fp++
+								fail_C = true
+							}
+						} else { // ¬A
+							if class_of_execution == database[k][RECORD_POS_CLASS] { // C
+								// fn++
+								fail_A = true
+							} else { // ¬C
+								// tn++
+								fail_A = true
+								fail_C = true
+							}
 						}
-					} else { // ¬A
-						if class_of_execution == database[k][RECORD_SIZE-1] { // C
-							fn++
-						} else { // ¬C
-							tn++
-						}
-					}
-				case GREATER_OR_EQUAL:
-					if individual[i].Value == database[k][i] { // A
-						if class_of_execution == database[k][RECORD_SIZE-1] { // C
-							tp++
-						} else { // ¬C
-							fp++
-						}
-					} else { // ¬A
-						if class_of_execution == database[k][RECORD_SIZE-1] { // C
-							fn++
-						} else { // ¬C
-							tn++
-						}
-					}
-				case LESS:
-					if individual[i].Value == database[k][i] { // A
-						if class_of_execution == database[k][RECORD_SIZE-1] { // C
-							tp++
-						} else { // ¬C
-							fp++
-						}
-					} else { // ¬A
-						if class_of_execution == database[k][RECORD_SIZE-1] { // C
-							fn++
-						} else { // ¬C
-							tn++
+					case LESS:
+						if individual[i].Value == database[k][i] { // A
+							if class_of_execution == database[k][RECORD_POS_CLASS] { // C
+								// tp++
+							} else { // ¬C
+								//fp++
+								fail_C = true
+							}
+						} else { // ¬A
+							if class_of_execution == database[k][RECORD_POS_CLASS] { // C
+								// fn++
+								fail_A = true
+							} else { // ¬C
+								// tn++
+								fail_A = true
+								fail_C = true
+							}
 						}
 					}
 				}
 			}
+		} /*SE A  ENTAO C  = TP
+		SE A  ENTAO ¬C = FP
+		SE ¬A ENTAO C  = FN
+		SE ¬A ENTAO ¬C = TN*/
+		if fail_A && fail_C {
+			tn++
+		} else {
+			if fail_A {
+				fn++
+			} else {
+				if fail_C {
+					fp++
+				} else {
+					tp++
+				}
+			}
 		}
 	}
-	sp = tp / (tp + fp)
-	se = tn / (tn + fn)
+
+	// Fidelis
+	// se = tp / (tp +fn)       sp = tn / (tn + fp)
+	se = tp / (tp + fn)
+	sp = tn / (tn + fp)
+	// se = tp + 1/(tp+fn+1)
+	// sp = tn + 1/(tn+fp+1)
+
+	// Clay
+	// sp = tp / (tp + fp)      se = tn / (tn + fn)
+	// sp = tp / (tp + fp)
+	// se = tn / (tn + fn)
 	eval = sp * se
 	individual[POS_EVAL].Weight = eval
-	// fmt.Println("TP: ", tp)
-	// fmt.Println("TN: ", tn)
-	// fmt.Println("FP: ", fp)
-	// fmt.Println("FN: ", fn)
-	// fmt.Println("SP: ", sp)
-	// fmt.Println("SE: ", se)
-	// fmt.Println("EVAL: ", eval)
+	fmt.Print("TP: ", tp)
+	fmt.Print("    FN: ", fn)
+	fmt.Println(" ")
+	fmt.Print("TN: ", tn)
+	fmt.Print("    FP: ", fp)
+	fmt.Println(" ")
+	fmt.Print("SP: ", sp)
+	fmt.Print("    SE: ", se)
+	fmt.Println(" ")
+	fmt.Print("EVAL: ", eval)
+	fmt.Println(" ")
 }
 
 func initPopulation() {
 	//rand.Seed(1)
 	rand.Seed(time.Now().UTC().UnixNano())
-
 	var i, j int
 
 	for i = 0; i < POPULATION_PARENTS_SIZE; i++ {
 		for j = 0; j < INDIVIDUAL_SIZE; j++ {
 			var individual Individual
-
 			individual.Weight = rand.Float32()
 			individual.Operator = rand.Intn(4)
 			individual.Value = rand.Intn(4)
-
 			population[i][j] = individual
 		}
 	}
-
 }
 
 func printPopulation() {
-	//for i := 0; i < POPULATION_TOTAL_SIZE; i++ {
 	for i := 0; i < POPULATION_PARENTS_SIZE; i++ {
 		fmt.Print("Individuo [", i)
 		fmt.Println("]: ", population[i])
@@ -373,9 +485,8 @@ func printIndividual(individual [VECTOR_SIZE]Individual) {
 }
 
 func initDatabase() {
-	// 366 / 6 = 61 records for each class
-	// training = 244 records - 40 records for each class
-	// teste = 122 records - 20 records fo each class
+	// training = 234 records - 39 records for each class
+	// teste = 114 records - 19 records fo each class
 	//var class_1, class_2, class_3, class_4, class_5, class_6 int
 	if file, err := os.Open("dermatology.data"); err == nil {
 
@@ -383,16 +494,28 @@ func initDatabase() {
 
 		scanner := bufio.NewScanner(file)
 		i := 0
-		//for scanner.Scan() {
-		for k := 0; k < RECORD_QUANTITY; k++ {
-			scanner.Scan()
-			result := strings.Split(scanner.Text(), ",")
-			//			class, _ := strconv.Atoi(result[RECORD_SIZE-1])
 
-			for j := 0; j < RECORD_SIZE; j++ {
-				database[i][j], _ = strconv.Atoi(result[j])
+		if TRAINING_DATABASE {
+			for k := 0; k < RECORD_QUANTITY; k++ {
+				scanner.Scan()
+				result := strings.Split(scanner.Text(), ",")
+				//			class, _ := strconv.Atoi(result[RECORD_SIZE-1])
+				for j := 0; j < RECORD_SIZE; j++ {
+					database[i][j], _ = strconv.Atoi(result[j])
+				}
+				i++
 			}
-			i++
+		} else {
+			for k := 0; k < RECORD_TOTAL_DATABASE; k++ {
+				scanner.Scan()
+				result := strings.Split(scanner.Text(), ",")
+				//			class, _ := strconv.Atoi(result[RECORD_SIZE-1])
+				//if (RECORD_QUANTITY)
+				for j := 0; j < RECORD_SIZE; j++ {
+					database[i][j], _ = strconv.Atoi(result[j])
+				}
+				i++
+			}
 		}
 		if err = scanner.Err(); err != nil {
 			log.Fatal(err)
