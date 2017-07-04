@@ -3,9 +3,42 @@ package main
 import (
 	"fmt"
 	"github.com/vitorbg/trabalho-ic/rn_perceptron/display"
+	"os"
+	"strconv"
 )
 
+const WEIGHT_ZERO = 0
+const WEIGHT_RANDOM = 1
+
+const PERCEPTRON_ONE = 1
+const PERCEPTRON_TWO = 2
+const PERCEPTRON_THREE = 3
+
 func main() {
+	var weight_selected int
+	var perceptron_selected int
+
+	fmt.Println("---------------------------------------------------------------")
+	fmt.Println("USAGE")
+	fmt.Println("0- Zero Weight, 1- Random Weight")
+	fmt.Println("1- Perceptron One, 2- Perceptron Two, 3- Perceptron Three ")
+	fmt.Println("go run main.go weight perceptron")
+	fmt.Println("go run main.go 0 1")
+	fmt.Println("---------------------------------------------------------------")
+
+	if len(os.Args) > 1 {
+		weight_selected, _ = strconv.Atoi(os.Args[1])
+		perceptron_selected, _ = strconv.Atoi(os.Args[2])
+	} else {
+		fmt.Println("-------------------------------------------------------------")
+		fmt.Println("USAGE")
+		fmt.Println("0- Zero Weight, 1- Random Weight")
+		fmt.Println("1- Perceptron One, 2- Perceptron Two, 3- Perceptron Three ")
+		fmt.Println("go run main.go weight perceptron")
+		fmt.Println("go run main.go 0 1")
+		fmt.Println("-------------------------------------------------------------")
+		panic("Wrong Arguments")
+	}
 
 	d1 := []int{0, 1}
 	d2 := [2][]int{{1, 0}, {0, 1}}
@@ -20,218 +53,236 @@ func main() {
 	n_five_distorted := display.GetNumbersFiveDistorted()
 	n_letters := display.GetLetters()
 
+	switch perceptron_selected {
 	//Perceptron One ***************************************************************
-	w1_init := display.GetWeightZero()
-	// w1_init := display.GetWeightRandom()
+	case PERCEPTRON_ONE:
+		var w1_init []int
+		switch weight_selected {
+		case WEIGHT_ZERO:
+			w1_init = display.GetWeightZero()
+		case WEIGHT_RANDOM:
+			w1_init = display.GetWeightRandom()
+		}
 
-	fmt.Println("PERCEPTRON ONE ************************************************")
-	fmt.Println("INPUT WEIGHT:")
-	fmt.Print(w1_init)
-	fmt.Println("")
+		fmt.Println("PERCEPTRON ONE ************************************************")
+		fmt.Println("INPUT WEIGHT:")
+		fmt.Print(w1_init)
+		fmt.Println("")
 
-	epoch, w1 := perceptronOne(n, w1_init, d1)
+		epoch, w1 := perceptronOne(n, w1_init, d1)
 
-	fmt.Println("Perceptron One Weight Vector")
-	fmt.Println("Epochs of Training: ", epoch)
-	printDisplay(w1)
+		fmt.Println("Perceptron One Weight Vector")
+		fmt.Println("Epochs of Training: ", epoch)
+		printDisplay(w1)
 
-	for i := 0; i < 2; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n[i])
-		fmt.Println("OUTPUT: ", y(n[i], w1))
-	}
-	fmt.Println("One Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_one_distorted[i])
-		fmt.Println("OUTPUT: ", y(n_one_distorted[i], w1))
-	}
-	fmt.Println("Zero Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_zero_distorted[i])
-		fmt.Println("OUTPUT: ", y(n_zero_distorted[i], w1))
-	}
-	fmt.Println("Numbers Examples")
-	for i := 2; i < 6; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n[i])
-		fmt.Println("OUTPUT: ", y(n[i], w1))
-	}
-	//******************************************************************************
-	//Perceptron Two ***************************************************************
-	// w2_init := display.GetWeightZeroTwoNeurons()
-	w2_init := display.GetWeightRandomTwoNeurons()
+		for i := 0; i < 2; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n[i])
+			fmt.Println("OUTPUT: ", y(n[i], w1))
+		}
+		fmt.Println("Zero Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_zero_distorted[i])
+			fmt.Println("OUTPUT: ", y(n_zero_distorted[i], w1))
+		}
+		fmt.Println("One Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_one_distorted[i])
+			fmt.Println("OUTPUT: ", y(n_one_distorted[i], w1))
+		}
+		fmt.Println("Numbers Examples")
+		for i := 2; i < 6; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n[i])
+			fmt.Println("OUTPUT: ", y(n[i], w1))
+		}
+		//******************************************************************************
+		//Perceptron Two ***************************************************************
+	case PERCEPTRON_TWO:
+		var w2_init [2][]int
+		switch weight_selected {
+		case WEIGHT_ZERO:
+			w2_init = display.GetWeightZeroTwoNeurons()
+		case WEIGHT_RANDOM:
+			w2_init = display.GetWeightRandomTwoNeurons()
+		}
+		fmt.Println("PERCEPTRON TWO ************************************************")
+		fmt.Println("INPUT WEIGHT:")
+		fmt.Print(w2_init[0])
+		fmt.Println("")
+		fmt.Print(w2_init[1])
+		fmt.Println("")
 
-	fmt.Println("PERCEPTRON TWO ************************************************")
-	fmt.Println("INPUT WEIGHT:")
-	fmt.Print(w2_init[0])
-	fmt.Println("")
-	fmt.Print(w2_init[1])
-	fmt.Println("")
+		epoch, w2 := perceptronTwo(n, w2_init, d2)
 
-	epoch, w2 := perceptronTwo(n, w2_init, d2)
+		fmt.Println("Perceptron Two Weight Vectors")
+		fmt.Println("Epochs of Training: ", epoch)
+		fmt.Println("Neuron 1")
+		printDisplay(w2[0])
+		fmt.Println("Neuron 2")
+		printDisplay(w2[1])
 
-	fmt.Println("Perceptron Two Weight Vectors")
-	fmt.Println("Epochs of Training: ", epoch)
-	fmt.Println("Neuron 1")
-	printDisplay(w2[0])
-	fmt.Println("Neuron 2")
-	printDisplay(w2[1])
+		for i := 0; i < 2; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n[i], w2[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n[i], w2[1]))
+		}
+		fmt.Println("Zero Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_zero_distorted[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n_zero_distorted[i], w2[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n_zero_distorted[i], w2[1]))
+		}
+		fmt.Println("One Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_one_distorted[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n_one_distorted[i], w2[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n_one_distorted[i], w2[1]))
+		}
 
-	for i := 0; i < 2; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n[i], w2[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n[i], w2[1]))
-	}
-	fmt.Println("Zero Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_zero_distorted[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n_zero_distorted[i], w2[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n_zero_distorted[i], w2[1]))
-	}
-	fmt.Println("One Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_one_distorted[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n_one_distorted[i], w2[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n_one_distorted[i], w2[1]))
-	}
-
-	fmt.Println("Numbers Examples")
-	for i := 2; i < 6; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n[i], w2[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n[i], w2[1]))
-	}
+		fmt.Println("Numbers Examples")
+		for i := 2; i < 6; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n[i], w2[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n[i], w2[1]))
+		}
 	//******************************************************************************
 	//Perceptron Three ***************************************************************
-	w3_init := display.GetWeightZeroSixNeurons()
-	// w3_init := display.GetWeightRandomSixNeurons()
+	case PERCEPTRON_THREE:
+		var w3_init [6][]int
+		switch weight_selected {
+		case WEIGHT_ZERO:
+			w3_init = display.GetWeightZeroSixNeurons()
+		case WEIGHT_RANDOM:
+			w3_init = display.GetWeightRandomSixNeurons()
+		}
+		fmt.Println("PERCEPTRON THREE **********************************************")
+		fmt.Println("INPUT WEIGHT:")
+		fmt.Print(w3_init[0])
+		fmt.Println("")
+		fmt.Print(w3_init[1])
+		fmt.Println("")
+		fmt.Print(w3_init[2])
+		fmt.Println("")
+		fmt.Print(w3_init[3])
+		fmt.Println("")
+		fmt.Print(w3_init[4])
+		fmt.Println("")
+		fmt.Print(w3_init[5])
+		fmt.Println("")
 
-	fmt.Println("PERCEPTRON THREE **********************************************")
-	fmt.Println("INPUT WEIGHT:")
-	fmt.Print(w3_init[0])
-	fmt.Println("")
-	fmt.Print(w3_init[1])
-	fmt.Println("")
-	fmt.Print(w3_init[2])
-	fmt.Println("")
-	fmt.Print(w3_init[3])
-	fmt.Println("")
-	fmt.Print(w3_init[4])
-	fmt.Println("")
-	fmt.Print(w3_init[5])
-	fmt.Println("")
+		epoch, w3 := perceptronThree(n, w3_init, d3)
 
-	epoch, w3 := perceptronThree(n, w3_init, d3)
+		fmt.Println("Perceptron Three Weight Vectors")
+		fmt.Println("Epochs of Training: ", epoch)
+		fmt.Println("Neuron 1")
+		printDisplay(w3[0])
+		fmt.Println("Neuron 2")
+		printDisplay(w3[1])
+		fmt.Println("Neuron 3")
+		printDisplay(w3[2])
+		fmt.Println("Neuron 4")
+		printDisplay(w3[3])
+		fmt.Println("Neuron 5")
+		printDisplay(w3[4])
+		fmt.Println("Neuron 6")
+		printDisplay(w3[5])
+		for i := 0; i < 6; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n[i], w3[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n[i], w3[1]))
+			fmt.Println("OUTPUT NEURON 3: ", y(n[i], w3[2]))
+			fmt.Println("OUTPUT NEURON 4: ", y(n[i], w3[3]))
+			fmt.Println("OUTPUT NEURON 5: ", y(n[i], w3[4]))
+			fmt.Println("OUTPUT NEURON 6: ", y(n[i], w3[5]))
 
-	fmt.Println("Perceptron Two Weight Vectors")
-	fmt.Println("Epochs of Training: ", epoch)
-	fmt.Println("Neuron 1")
-	printDisplay(w3[0])
-	fmt.Println("Neuron 2")
-	printDisplay(w3[1])
-	fmt.Println("Neuron 3")
-	printDisplay(w3[2])
-	fmt.Println("Neuron 4")
-	printDisplay(w3[3])
-	fmt.Println("Neuron 5")
-	printDisplay(w3[4])
-	fmt.Println("Neuron 6")
-	printDisplay(w3[5])
-	for i := 0; i < 6; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n[i], w3[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n[i], w3[1]))
-		fmt.Println("OUTPUT NEURON 3: ", y(n[i], w3[2]))
-		fmt.Println("OUTPUT NEURON 4: ", y(n[i], w3[3]))
-		fmt.Println("OUTPUT NEURON 5: ", y(n[i], w3[4]))
-		fmt.Println("OUTPUT NEURON 6: ", y(n[i], w3[5]))
-
+		}
+		fmt.Println("Zero Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_zero_distorted[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n_zero_distorted[i], w3[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n_zero_distorted[i], w3[1]))
+			fmt.Println("OUTPUT NEURON 3: ", y(n_zero_distorted[i], w3[2]))
+			fmt.Println("OUTPUT NEURON 4: ", y(n_zero_distorted[i], w3[3]))
+			fmt.Println("OUTPUT NEURON 5: ", y(n_zero_distorted[i], w3[4]))
+			fmt.Println("OUTPUT NEURON 6: ", y(n_zero_distorted[i], w3[5]))
+		}
+		fmt.Println("One Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_one_distorted[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n_one_distorted[i], w3[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n_one_distorted[i], w3[1]))
+			fmt.Println("OUTPUT NEURON 3: ", y(n_one_distorted[i], w3[2]))
+			fmt.Println("OUTPUT NEURON 4: ", y(n_one_distorted[i], w3[3]))
+			fmt.Println("OUTPUT NEURON 5: ", y(n_one_distorted[i], w3[4]))
+			fmt.Println("OUTPUT NEURON 6: ", y(n_one_distorted[i], w3[5]))
+		}
+		fmt.Println("Two Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_two_distorted[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n_two_distorted[i], w3[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n_two_distorted[i], w3[1]))
+			fmt.Println("OUTPUT NEURON 3: ", y(n_two_distorted[i], w3[2]))
+			fmt.Println("OUTPUT NEURON 4: ", y(n_two_distorted[i], w3[3]))
+			fmt.Println("OUTPUT NEURON 5: ", y(n_two_distorted[i], w3[4]))
+			fmt.Println("OUTPUT NEURON 6: ", y(n_two_distorted[i], w3[5]))
+		}
+		fmt.Println("Three Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_three_distorted[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n_three_distorted[i], w3[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n_three_distorted[i], w3[1]))
+			fmt.Println("OUTPUT NEURON 3: ", y(n_three_distorted[i], w3[2]))
+			fmt.Println("OUTPUT NEURON 4: ", y(n_three_distorted[i], w3[3]))
+			fmt.Println("OUTPUT NEURON 5: ", y(n_three_distorted[i], w3[4]))
+			fmt.Println("OUTPUT NEURON 6: ", y(n_three_distorted[i], w3[5]))
+		}
+		fmt.Println("Four Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_four_distorted[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n_four_distorted[i], w3[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n_four_distorted[i], w3[1]))
+			fmt.Println("OUTPUT NEURON 3: ", y(n_four_distorted[i], w3[2]))
+			fmt.Println("OUTPUT NEURON 4: ", y(n_four_distorted[i], w3[3]))
+			fmt.Println("OUTPUT NEURON 5: ", y(n_four_distorted[i], w3[4]))
+			fmt.Println("OUTPUT NEURON 6: ", y(n_four_distorted[i], w3[5]))
+		}
+		fmt.Println("Five Distorted Examples")
+		for i := 0; i < 10; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_five_distorted[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n_five_distorted[i], w3[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n_five_distorted[i], w3[1]))
+			fmt.Println("OUTPUT NEURON 3: ", y(n_five_distorted[i], w3[2]))
+			fmt.Println("OUTPUT NEURON 4: ", y(n_five_distorted[i], w3[3]))
+			fmt.Println("OUTPUT NEURON 5: ", y(n_five_distorted[i], w3[4]))
+			fmt.Println("OUTPUT NEURON 6: ", y(n_five_distorted[i], w3[5]))
+		}
+		fmt.Println("Letters Examples")
+		for i := 0; i < 6; i++ {
+			fmt.Println("INPUT")
+			printDisplay(n_letters[i])
+			fmt.Println("OUTPUT NEURON 1: ", y(n_letters[i], w3[0]))
+			fmt.Println("OUTPUT NEURON 2: ", y(n_letters[i], w3[1]))
+			fmt.Println("OUTPUT NEURON 3: ", y(n_letters[i], w3[2]))
+			fmt.Println("OUTPUT NEURON 4: ", y(n_letters[i], w3[3]))
+			fmt.Println("OUTPUT NEURON 5: ", y(n_letters[i], w3[4]))
+			fmt.Println("OUTPUT NEURON 6: ", y(n_letters[i], w3[5]))
+		}
+		//******************************************************************************
 	}
-	fmt.Println("Zero Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_zero_distorted[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n_zero_distorted[i], w3[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n_zero_distorted[i], w3[1]))
-		fmt.Println("OUTPUT NEURON 3: ", y(n_zero_distorted[i], w3[2]))
-		fmt.Println("OUTPUT NEURON 4: ", y(n_zero_distorted[i], w3[3]))
-		fmt.Println("OUTPUT NEURON 5: ", y(n_zero_distorted[i], w3[4]))
-		fmt.Println("OUTPUT NEURON 6: ", y(n_zero_distorted[i], w3[5]))
-	}
-	fmt.Println("One Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_one_distorted[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n_one_distorted[i], w3[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n_one_distorted[i], w3[1]))
-		fmt.Println("OUTPUT NEURON 3: ", y(n_one_distorted[i], w3[2]))
-		fmt.Println("OUTPUT NEURON 4: ", y(n_one_distorted[i], w3[3]))
-		fmt.Println("OUTPUT NEURON 5: ", y(n_one_distorted[i], w3[4]))
-		fmt.Println("OUTPUT NEURON 6: ", y(n_one_distorted[i], w3[5]))
-	}
-	fmt.Println("Two Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_two_distorted[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n_two_distorted[i], w3[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n_two_distorted[i], w3[1]))
-		fmt.Println("OUTPUT NEURON 3: ", y(n_two_distorted[i], w3[2]))
-		fmt.Println("OUTPUT NEURON 4: ", y(n_two_distorted[i], w3[3]))
-		fmt.Println("OUTPUT NEURON 5: ", y(n_two_distorted[i], w3[4]))
-		fmt.Println("OUTPUT NEURON 6: ", y(n_two_distorted[i], w3[5]))
-	}
-	fmt.Println("Three Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_three_distorted[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n_three_distorted[i], w3[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n_three_distorted[i], w3[1]))
-		fmt.Println("OUTPUT NEURON 3: ", y(n_three_distorted[i], w3[2]))
-		fmt.Println("OUTPUT NEURON 4: ", y(n_three_distorted[i], w3[3]))
-		fmt.Println("OUTPUT NEURON 5: ", y(n_three_distorted[i], w3[4]))
-		fmt.Println("OUTPUT NEURON 6: ", y(n_three_distorted[i], w3[5]))
-	}
-	fmt.Println("Four Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_four_distorted[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n_four_distorted[i], w3[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n_four_distorted[i], w3[1]))
-		fmt.Println("OUTPUT NEURON 3: ", y(n_four_distorted[i], w3[2]))
-		fmt.Println("OUTPUT NEURON 4: ", y(n_four_distorted[i], w3[3]))
-		fmt.Println("OUTPUT NEURON 5: ", y(n_four_distorted[i], w3[4]))
-		fmt.Println("OUTPUT NEURON 6: ", y(n_four_distorted[i], w3[5]))
-	}
-	fmt.Println("Five Distorted Examples")
-	for i := 0; i < 10; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_five_distorted[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n_five_distorted[i], w3[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n_five_distorted[i], w3[1]))
-		fmt.Println("OUTPUT NEURON 3: ", y(n_five_distorted[i], w3[2]))
-		fmt.Println("OUTPUT NEURON 4: ", y(n_five_distorted[i], w3[3]))
-		fmt.Println("OUTPUT NEURON 5: ", y(n_five_distorted[i], w3[4]))
-		fmt.Println("OUTPUT NEURON 6: ", y(n_five_distorted[i], w3[5]))
-	}
-	fmt.Println("Letters Examples")
-	for i := 0; i < 6; i++ {
-		fmt.Println("INPUT")
-		printDisplay(n_letters[i])
-		fmt.Println("OUTPUT NEURON 1: ", y(n_letters[i], w3[0]))
-		fmt.Println("OUTPUT NEURON 2: ", y(n_letters[i], w3[1]))
-		fmt.Println("OUTPUT NEURON 3: ", y(n_letters[i], w3[2]))
-		fmt.Println("OUTPUT NEURON 4: ", y(n_letters[i], w3[3]))
-		fmt.Println("OUTPUT NEURON 5: ", y(n_letters[i], w3[4]))
-		fmt.Println("OUTPUT NEURON 6: ", y(n_letters[i], w3[5]))
-	}
-	//******************************************************************************
 }
 
 func y(x []int, w []int) int {

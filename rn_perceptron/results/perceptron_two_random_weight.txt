@@ -1,0 +1,292 @@
+---------------------------------------------------------------
+USAGE
+0- Zero Weight, 1- Random Weight
+1- Perceptron One, 2- Perceptron Two, 3- Perceptron Three 
+go run main.go weight perceptron
+go run main.go 0 1
+---------------------------------------------------------------
+PERCEPTRON TWO ************************************************
+INPUT WEIGHT:
+[0 0 -1 0 -1 0 0 1 1 -1 0 0 1 -1 1 0 1 0 0 1 -1 -1 0 -1 1 0 0 -1 1 1 0]
+[-1 1 -1 0 1 1 0 0 -1 0 1 0 0 1 -1 0 -1 0 -1 1 -1 0 0 -1 1 0 0 -1 0 -1 0]
+Perceptron Two Weight Vectors
+Epochs of Training:  2
+Neuron 1
+0 
+0 0 0 0 0 
+1 0 0 -1 1 
+1 1 -2 1 1 
+2 0 -1 1 0 
+0 0 -2 1 1 
+-1 -1 1 1 -1 
+Neuron 2
+-1 
+1 -2 0 0 1 
+-1 1 0 0 0 
+-1 0 2 -1 -1 
+-2 0 0 1 -2 
+-1 0 0 1 -1 
+1 -1 0 -1 1 
+INPUT
+1 
+0 1 1 1 0 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+0 1 1 1 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 0 1 0 0 
+0 1 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+1 1 1 1 1 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  1
+Zero Distorted Examples
+INPUT
+1 
+1 1 1 1 1 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+1 1 1 1 1 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 1 0 1 0 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+0 1 0 1 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 0 1 1 0 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+0 0 1 1 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 1 1 1 0 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+0 0 1 0 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 1 1 0 0 
+1 0 0 0 0 
+1 0 0 0 1 
+1 0 0 0 0 
+1 0 0 0 0 
+0 1 1 1 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 1 0 1 0 
+1 0 0 0 1 
+0 0 0 0 1 
+0 0 0 0 1 
+1 0 0 0 1 
+0 1 0 0 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 0 1 0 0 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+1 0 0 0 1 
+0 0 1 0 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 1 1 0 0 
+1 0 0 0 1 
+0 0 0 0 0 
+0 0 0 0 0 
+1 0 0 0 1 
+0 1 1 0 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 0 1 1 0 
+1 0 0 0 1 
+0 0 0 0 0 
+1 0 0 0 0 
+0 0 0 0 1 
+0 1 0 1 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 0 1 0 0 
+0 0 0 0 0 
+1 0 0 0 1 
+0 0 0 0 0 
+0 0 0 0 0 
+0 0 1 0 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+One Distorted Examples
+INPUT
+1 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+1 1 1 1 1 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  1
+INPUT
+1 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 1 1 1 1 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 0 1 0 0 
+0 1 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 1 1 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  1
+INPUT
+1 
+0 0 1 0 0 
+0 1 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+1 1 1 0 0 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  1
+INPUT
+1 
+0 0 1 0 0 
+0 1 1 0 0 
+0 0 1 0 0 
+0 0 0 0 0 
+0 0 0 0 0 
+1 1 1 1 1 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  1
+INPUT
+1 
+0 0 0 0 0 
+0 1 0 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+1 1 1 1 1 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  1
+INPUT
+1 
+0 0 1 0 0 
+0 1 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 0 0 0 
+1 1 0 1 1 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  1
+INPUT
+1 
+0 0 1 0 0 
+0 1 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+1 1 1 1 1 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  1
+INPUT
+1 
+0 0 0 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+1 1 1 1 0 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+0 0 1 0 0 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  1
+Numbers Examples
+INPUT
+1 
+0 1 1 1 0 
+0 1 0 1 0 
+0 0 0 1 0 
+0 0 1 0 0 
+0 1 0 0 0 
+1 1 1 1 1 
+OUTPUT NEURON 1:  0
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 1 1 1 1 
+0 0 0 0 1 
+0 1 1 1 1 
+0 0 0 0 1 
+0 0 0 0 1 
+0 1 1 1 1 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+1 0 0 1 0 
+1 0 0 1 0 
+1 0 0 1 0 
+1 1 1 1 0 
+0 0 0 1 0 
+0 0 0 1 0 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
+INPUT
+1 
+0 1 1 1 1 
+0 1 0 0 0 
+0 1 1 1 1 
+0 0 0 0 1 
+0 0 0 0 1 
+0 1 1 1 1 
+OUTPUT NEURON 1:  1
+OUTPUT NEURON 2:  0
